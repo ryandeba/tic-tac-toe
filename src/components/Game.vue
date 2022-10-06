@@ -11,6 +11,10 @@
 	];
 
 	export default {
+		components: {
+			"game-grid": require("./Game-grid").default,
+		},
+
 		props: {
 			socket: {
 				type: Object
@@ -19,10 +23,6 @@
 			game: {
 				type: Object,
 			},
-
-			playerTurnIndex: {
-				type: Number,
-			}
 		},
 
 		computed: {
@@ -48,6 +48,30 @@
 
 			gameOver() {
 				return this.winningPlayerIndex != undefined || this.isTied;
+			},
+
+			friendlyStatus() {
+				if (this.game.players.length < 2) {
+					return "Waiting for other player to join";
+				}
+
+				if (this.isTied) {
+					return "Game is tied - nobody wins";
+				}
+
+				if (this.gameOver) {
+					if (this.game.players[this.winningPlayerIndex].socketID == this.socket.id) {
+						return "You win!";
+					}
+
+					return "You lose!";
+				}
+
+				if (this.game.players[this.game.playerTurnIndex].socketID == this.socket.id) {
+					return "Your turn";
+				}
+
+				return "Opponent's turn";
 			}
 		},
 
@@ -72,70 +96,70 @@
 
 <template>
 	<div>
-		<div style="margin-bottom: 12px;">
-			<strong>Players:</strong>
-
-			<div
-				v-for="(p, i) in game.players"
-				style="padding: 2px;"
-			>
-				<template v-if="p.socketID == socket.id">
-					You:
-				</template>
-
-				<template v-else>
-					Opponent:
-				</template>
-
-				{{ i == 0 ? "X" : "O" }}
-
-				<span>
-					<template v-if="winningPlayerIndex == i">
-						🥇
-					</template>
-
-					<template v-if="!gameOver && game.playerTurnIndex == i">
-						👈
-					</template>
-				</span>
-			</div>
+		<div style="text-align: center; font-size: 1.5em;">
+			{{ friendlyStatus }}
 		</div>
 
-		<div
-			class="grid"
+		<template v-if="game.players.length == 2">
+			<div style="margin-bottom: 24px;">
+				<div style="display: flex; justify-content: space-around;">
+					<!-- TODO: improve "waiting for other player" ui -->
+					<div
+						v-for="(p, i) in game.players"
+						:key="i"
+						class="player"
+						:class="!gameOver && game.playerTurnIndex == i ? 'player--turn' : ''"
+					>
+						<template v-if="p.socketID == socket.id">
+							You:
+						</template>
+
+						<template v-else>
+							Opponent:
+						</template>
+
+						{{ i == 0 ? "X" : "O" }}
+					</div>
+				</div>
+			</div>
+
+			<div style="display: flex; justify-content: center;">
+				<game-grid
+					:game="game"
+					:winningIndeces="winningIndeces"
+					@cell-click="onCellClick"
+				></game-grid>
+			</div>
+		</template>
+
+		<button
+			type="button"
+			@click="$emit('exit')"
+			class="exit-button"
 		>
-			<div
-				v-for="(c, i) in game.grid"
-				:key="i"
-				class="cell"
-				:class="winningIndeces && winningIndeces.indexOf(i) > -1 ? 'cell--highlight' : ''"
-				@click="onCellClick(i)"
-			>
-				{{ c }}
-			</div>
-		</div>
+			&lt; Back to Lobby
+		</button>
 	</div>
 </template>
 
 <style scoped>
-	.grid {
-		display: inline-grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		grid-gap: 5px;
-		background: black;
+	.player {
+		border: 1px solid #FA7F08;
+		border-radius: 12px;
+		background: #22BABB;
+		padding: 12px;
+		margin: 12px;
+		text-align: center;
+		min-width: 200px;
 	}
 
-	.cell {
-		height: 20vh;
-		aspect-ratio: 1;
-		background: white;
-
-		display: flex;
-		align-items: center;
-		justify-content: center;
+	.player--turn {
+		box-shadow: 0 0 12px 12px #FA7F08;
 	}
 
-	.cell--highlight {
-		background: gold;
+	.exit-button {
+		position: fixed;
+		left: 4px;
+		bottom: 4px;
 	}
 </style>

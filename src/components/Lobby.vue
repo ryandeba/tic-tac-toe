@@ -1,5 +1,9 @@
 <script>
 	export default {
+		components: {
+			"game-grid": require("./Game-grid").default,
+		},
+
 		props: {
 			socket: {
 				type: Object
@@ -23,26 +27,53 @@
 </script>
 
 <template>
-	<div>
-		<button
-			type="button"
-			@click="newGame"
-		>
-			New Game
-		</button>
-
-		<hr>
-
-		<div v-for="g in games" :key="g.id">
-			<button
-				type="button"
-				@click="joinGame(g)"
-				v-if="g.players.length == 1"
+	<div style="display: flex; justify-content: center;">
+		<div style="display: grid; grid-gap: 12px; max-width: 600px; width: 100%;">
+			<div
+				v-for="g in games"
+				:key="g.id"
+				class="game"
 			>
-				Join
-			</button>
+				<game-grid :game="g"></game-grid>
 
-			{{ g }}
+				<template v-if="g.players.find(p => p.socketID == socket.id)">
+					<button
+						type="button"
+						@click="$emit('resume', g.id)"
+					>
+						Resume
+					</button>
+				</template>
+
+				<template v-else-if="g.players.length == 1">
+					<button
+						type="button"
+						@click="joinGame(g)"
+					>
+						Join
+					</button>
+				</template>
+			</div>
+
+			<div style="text-align: center;">
+				<button
+					type="button"
+					@click="newGame"
+				>
+					New Game
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
+
+<style scoped>
+	.game {
+		border: 1px solid #FA7F08;
+		border-radius: 12px;
+		background: #22BABB;
+		padding: 12px;
+		margin: 12px;
+		text-align: center;
+	}
+</style>

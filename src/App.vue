@@ -47,6 +47,7 @@
 			<game
 				:socket="socket"
 				:game="game"
+				@exit="gameID = undefined"
 			></game>
 		</template>
 
@@ -54,7 +55,30 @@
 			<lobby
 				:socket="socket"
 				:games="games"
+				@resume="gameID = $event"
 			></lobby>
 		</template>
+
+		{{ socket.id }}
 	</div>
 </template>
+
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap');
+
+	#app {
+		font-family: 'Open Sans', sans-serif;
+	}
+
+	html {
+		background: #348888;
+	}
+
+	button {
+		background: #9EF8EE;
+		padding: 12px;
+		border-radius: 12px;
+		border: none;
+		box-shadow: 2px 2px 2px 2px #000;
+	}
+</style>

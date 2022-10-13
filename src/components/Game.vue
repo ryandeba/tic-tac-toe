@@ -100,6 +100,17 @@
 			{{ friendlyStatus }}
 		</div>
 
+		<template v-if="gameOver">
+			<div style="text-align: center; position: absolute; width: 100%;">
+				<button
+					type="button"
+					@click="socket.emit('play-again', game.id)"
+				>
+					Play Again
+				</button>
+			</div>
+		</template>
+
 		<template v-if="game.players.length == 2">
 			<div style="margin-bottom: 24px;">
 				<div style="display: flex; justify-content: space-around;">

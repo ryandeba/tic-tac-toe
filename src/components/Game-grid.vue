@@ -1,4 +1,7 @@
 <script>
+	import X from "./x.png";
+	import O from "./o.png";
+
 	export default {
 		props: {
 			game: {
@@ -7,13 +10,30 @@
 
 			winningIndeces: {
 				type: Array,
+			},
+
+			compact: {
+				type: Boolean,
+				default: false
 			}
+		},
+
+		data() {
+			return {
+				images: {
+					X,
+					O,
+				}
+			};
 		},
 	}
 </script>
 
 <template>
-	<div class="grid">
+	<div
+		class="grid"
+		:class="compact ? 'grid--compact' : ''"
+	>
 		<div
 			v-for="(c, i) in game.grid"
 			:key="i"
@@ -21,7 +41,7 @@
 			:class="winningIndeces && winningIndeces.indexOf(i) > -1 ? 'cell--highlight' : ''"
 			@click="$emit('cell-click', i)"
 		>
-			{{ c }}
+			<img :src="images[c]">
 		</div>
 	</div>
 </template>
@@ -30,14 +50,19 @@
 	.grid {
 		display: inline-grid;
 		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-rows: 1fr 1fr 1fr;
 		grid-gap: 5px;
+		aspect-ratio: 1;
+		width: 60vw;
+		max-width: 60vh;
 		background: black;
 	}
 
+	.grid.grid--compact {
+		width: 8vw;
+	}
+
 	.cell {
-		width: 20vw;
-		max-width: 20vh;
-		aspect-ratio: 1;
 		background: white;
 
 		display: flex;
@@ -47,5 +72,9 @@
 
 	.cell--highlight {
 		background: gold;
+	}
+
+	.cell img {
+		width: 80%;
 	}
 </style>

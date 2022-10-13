@@ -1,8 +1,6 @@
 <script>
 	import { io } from '/node_modules/socket.io/client-dist/socket.io.js';
 
-	const socket = io.connect("//localhost:3000");
-
 	export default {
 		name: 'App',
 
@@ -13,7 +11,7 @@
 
 		data() {
 			return {
-				socket: socket,
+				socket: io.connect(`//${new URL(window.location).hostname}:3000`),
 
 				games: [],
 
@@ -28,15 +26,16 @@
 		},
 
 		mounted() {
-			socket.on("games", games => {
+			this.socket.on("games", games => {
+				games.reverse();
 				this.games = games;
 			});
 
-			socket.on("game-id", gameID => {
+			this.socket.on("game-id", gameID => {
 				this.gameID = gameID;
 			});
 
-			socket.emit("games");
+			this.socket.emit("games");
 		}
 	}
 </script>
@@ -58,8 +57,6 @@
 				@resume="gameID = $event"
 			></lobby>
 		</template>
-
-		{{ socket.id }}
 	</div>
 </template>
 

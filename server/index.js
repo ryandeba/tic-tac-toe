@@ -52,6 +52,15 @@ io.on('connection', (socket) => {
 		socket.emit("game-id", game.id);
 	});
 
+	socket.on("play-again", gameID => {
+		let game = games.find(g => g.id == gameID);
+
+		game.grid = new Array(9).fill("");
+		game.playerTurnIndex = 0;
+
+		io.emit("games", games);
+	});
+
 	socket.on("game:clickCell", data => {
 		let game = games.find(g => g.id == data.gameID);
 

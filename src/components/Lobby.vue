@@ -29,12 +29,34 @@
 <template>
 	<div style="display: flex; justify-content: center;">
 		<div style="display: grid; grid-gap: 12px; max-width: 600px; width: 100%;">
+			<div style="text-align: center; font-size: 1.5em; margin-bottom: 24px;">
+				Tic-Tac-Toe Lobby
+			</div>
+
+			<div style="text-align: center;">
+				<button
+					type="button"
+					@click="newGame"
+				>
+					New Game
+				</button>
+			</div>
+
 			<div
 				v-for="g in games"
 				:key="g.id"
 				class="game"
 			>
-				<game-grid :game="g"></game-grid>
+				<div>
+					ID: {{ String(g.id).substr(-4) }}
+				</div>
+
+				<div>
+					<game-grid
+						:game="g"
+						compact
+					></game-grid>
+				</div>
 
 				<template v-if="g.players.find(p => p.socketID == socket.id)">
 					<button
@@ -54,15 +76,6 @@
 					</button>
 				</template>
 			</div>
-
-			<div style="text-align: center;">
-				<button
-					type="button"
-					@click="newGame"
-				>
-					New Game
-				</button>
-			</div>
 		</div>
 	</div>
 </template>
@@ -75,5 +88,7 @@
 		padding: 12px;
 		margin: 12px;
 		text-align: center;
+		display: grid;
+		grid-gap: 12px;
 	}
 </style>
